@@ -9,6 +9,7 @@ from src.buttons import (
 )
 from src.gifts import SellGift
 from src.helpers import check_subscription
+from src.logic import GiftLogic
 
 import asyncio
 
@@ -172,7 +173,7 @@ async def set_gift_pattern(message: Message, state: FSMContext):
         f"🖼 Фон: {data.get('gift_background')}\n"
         f"🎨 Цвет: {data.get('gift_color')}\n"
         f"🌟 Узор: {data.get('gift_pattern')}\n\n"
-        f"🌟 Цена: {data.get('price')}\n\n"
+        f"💰 Цена: {data.get('price')}\n\n"
         f"🔄 Опубликовать или вернуться главное в меню?",
         reply_markup=public_menu
     )
@@ -207,10 +208,12 @@ async def public_gift(message: Message, state: FSMContext):
         sent_message = await bot.send_message(CHANNEL_ID, post_text, parse_mode="Markdown")
         post_id = sent_message.message_id
         logger.debug(f"Post id - {post_id}")
-        # save_post(user_id=data["user_id"], post_id=post_id, gift_data=data)
+        await GiftLogic().save_post_to_db(data=data, user=message.from_user, post_id=post_id)
         logger.info(f"Подарок опубликован в канале {CHANNEL_ID}")
     except Exception as e:
         logger.error(f"Ошибка при публикации в канал: {e}")
+        await message.answer(f"❌ Ошибка публикации подарка", reply_markup=main_menu)
+        return
 
     await message.answer(
         f"✅ Ваш подарок опубликован в канале! 🎉\n\n"
