@@ -144,7 +144,7 @@ async def set_gift_price(message: Message, state: FSMContext):
     :return:
     """
     await state.update_data(gift_pattern=message.text)
-    await message.answer("💰 Укажите цену подарка в TON:")
+    await message.answer("💰 Укажите цену подарка в TON:", reply_markup=cancel_button)
     await state.set_state(SellGift.gift_pattern)
 
 
