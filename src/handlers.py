@@ -2,9 +2,10 @@ from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.filters import CommandStart
-from config import CHANNEL_ID, logger
+from config import CHANNEL_ID, logger, dp, bot
 from src.buttons import (
-    main_menu, top_up_menu, profile_menu, cancel_button, colors_menu, backgrounds_menu, models_menu, patterns_menu
+    main_menu, top_up_menu, profile_menu, cancel_button, colors_menu, backgrounds_menu, models_menu, patterns_menu,
+    public_menu
 )
 from src.gifts import SellGift
 from src.helpers import check_subscription
@@ -160,8 +161,46 @@ async def set_gift_pattern(message: Message, state: FSMContext):
         f"🎨 Цвет: {data.get('gift_color')}\n"
         f"🌟 Узор: {data.get('gift_pattern')}\n\n"
         f"🔄 Опубликовать или вернуться главное в меню?",
+        reply_markup=public_menu
+    )
+    await state.set_state(SellGift.gift_public)
+
+
+async def public_gift(message: Message, state: FSMContext):
+    """ Завершаем процесс продажи подарка и публикуем в канал
+    :param message:
+    :param state:
+    :return:
+    """
+    username = message.from_user.username
+    user_id = message.from_user.id
+    data = await state.get_data()
+
+    logger.info(f"Новый подарок на продажу от {username} (id: {user_id}): {data}")
+
+    post_text = (
+        f"🎁 *Новый подарок на продажу!*\n\n"
+        f"👤 Продавец: @{username}  \n"
+        f"🎁 *Название:* {data['gift_name']}\n"
+        f"📦 *Модель:* {data['gift_model']}\n"
+        f"🖼 *Фон:* {data['gift_background']}\n"
+        f"🎨 *Цвет:* {data['gift_color']}\n"
+        f"🌟 *Узор:* {data['gift_pattern']}\n\n"
+        f"💬 Свяжитесь с продавцом в ЛС: @{username}"
+    )
+
+    try:
+        await bot.send_message(CHANNEL_ID, post_text, parse_mode="Markdown")
+        logger.info(f"Подарок опубликован в канале {CHANNEL_ID}")
+    except Exception as e:
+        logger.error(f"Ошибка при публикации в канал: {e}")
+
+    await message.answer(
+        f"✅ Ваш подарок опубликован в канале! 🎉\n\n"
+        f"Вы можете проверить публикацию в нашем канале: {CHANNEL_ID}",
         reply_markup=main_menu
     )
+
     await state.clear()
 
 
@@ -187,3 +226,4 @@ def register_handlers(dispatcher: Dispatcher):
     dispatcher.message.register(set_gift_model, SellGift.gift_model)
     dispatcher.message.register(set_gift_background, SellGift.gift_background)
     dispatcher.message.register(set_gift_color, SellGift.gift_color)
+    dispatcher.message.register(public_gift, SellGift.gift_public)
