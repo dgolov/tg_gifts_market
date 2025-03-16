@@ -7,4 +7,5 @@ class SellGift(StatesGroup):
     gift_background = State()
     gift_color = State()
     gift_pattern = State()
+    waiting_for_price = State()
     gift_public = State()

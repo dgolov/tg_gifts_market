@@ -133,6 +133,18 @@ async def set_gift_color(message: Message, state: FSMContext):
     logger.debug(f"[Handlers] Sell gift color {message.text} command from user: {username} (id: {user_id})")
     await state.update_data(gift_color=message.text)
     await message.answer("🌟 Выберите узор подарка:", reply_markup=patterns_menu)
+    await state.set_state(SellGift.waiting_for_price)
+
+
+@dp.message(SellGift.waiting_for_price)
+async def set_gift_price(message: Message, state: FSMContext):
+    """ Пользователь выбрал узор, теперь запрашиваем цену
+    :param message:
+    :param state:
+    :return:
+    """
+    await state.update_data(gift_pattern=message.text)
+    await message.answer("💰 Укажите цену подарка в TON:")
     await state.set_state(SellGift.gift_pattern)
 
 
@@ -144,7 +156,7 @@ async def set_gift_pattern(message: Message, state: FSMContext):
     """
     username = message.from_user.username
     user_id = message.from_user.id
-    await state.update_data(gift_pattern=message.text)
+    await state.update_data(price=message.text)
 
     logger.debug(f"[Handlers] Sell gift pattern {message.text} command from user: {username} (id: {user_id})")
 
@@ -160,6 +172,7 @@ async def set_gift_pattern(message: Message, state: FSMContext):
         f"🖼 Фон: {data.get('gift_background')}\n"
         f"🎨 Цвет: {data.get('gift_color')}\n"
         f"🌟 Узор: {data.get('gift_pattern')}\n\n"
+        f"🌟 Цена: {data.get('price')}\n\n"
         f"🔄 Опубликовать или вернуться главное в меню?",
         reply_markup=public_menu
     )
@@ -186,11 +199,15 @@ async def public_gift(message: Message, state: FSMContext):
         f"🖼 *Фон:* {data['gift_background']}\n"
         f"🎨 *Цвет:* {data['gift_color']}\n"
         f"🌟 *Узор:* {data['gift_pattern']}\n\n"
+        f"💰 *Цена:* {data['price']} TON\n\n"
         f"💬 Свяжитесь с продавцом в ЛС: @{username}"
     )
 
     try:
-        await bot.send_message(CHANNEL_ID, post_text, parse_mode="Markdown")
+        sent_message = await bot.send_message(CHANNEL_ID, post_text, parse_mode="Markdown")
+        post_id = sent_message.message_id
+        logger.debug(f"Post id - {post_id}")
+        # save_post(user_id=data["user_id"], post_id=post_id, gift_data=data)
         logger.info(f"Подарок опубликован в канале {CHANNEL_ID}")
     except Exception as e:
         logger.error(f"Ошибка при публикации в канал: {e}")
