@@ -1,4 +1,4 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 
 main_menu = ReplyKeyboardMarkup(
@@ -65,3 +65,11 @@ patterns_menu = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+
+
+public_menu = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="🚀 Опубликовать"), KeyboardButton(text="❌ Отмена")]
+        ],
+        resize_keyboard=True
+    )
