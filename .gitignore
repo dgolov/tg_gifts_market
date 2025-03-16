@@ -1,4 +1,10 @@
 .env
+.env.db
 .idea/
 __pycache__/
 *.log
+
+db/init.sql
+
+/env
+/venv
