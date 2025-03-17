@@ -195,12 +195,12 @@ async def public_gift(message: Message, state: FSMContext):
     post_text = (
         f"🎁 *Новый подарок на продажу!*\n\n"
         f"👤 Продавец: @{username}  \n"
-        f"🎁 *Название:* {data['gift_name']}\n"
-        f"📦 *Модель:* {data['gift_model']}\n"
-        f"🖼 *Фон:* {data['gift_background']}\n"
-        f"🎨 *Цвет:* {data['gift_color']}\n"
-        f"🌟 *Узор:* {data['gift_pattern']}\n\n"
-        f"💰 *Цена:* {data['price']} TON\n\n"
+        f"🎁 *Название:* {data.get('gift_name')}\n"
+        f"📦 *Модель:* {data.get('gift_model')}\n"
+        f"🖼 *Фон:* {data.get('gift_background')}\n"
+        f"🎨 *Цвет:* {data.get('gift_color')}\n"
+        f"🌟 *Узор:* {data.get('gift_pattern')}\n\n"
+        f"💰 *Цена:* {data.get('price')} TON\n\n"
         f"💬 Свяжитесь с продавцом в ЛС: @{username}"
     )
 
