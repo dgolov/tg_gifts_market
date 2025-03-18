@@ -13,6 +13,8 @@ DEBUG = int(os.environ.get('DEBUG', 1))
 CHANNEL_ID = os.environ.get("CHANNEL_ID", "")
 SUBSCRIPTION_STATUSES = ["member", "administrator", "creator"]
 
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
 bot = Bot(token=os.environ.get("TOKEN", ""))
 dp = Dispatcher()
 
