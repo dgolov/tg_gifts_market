@@ -20,8 +20,8 @@ class GiftEntity(BaseEntity):
         await self.session.refresh(gift)
         return gift
 
-    async def get_gift_by_user(self, user_id: int):
-        """ Получаем подарок пользователя
+    async def get_gifts_by_user(self, user_id: int):
+        """ Получаем подарки пользователя
         :param user_id:
         :return:
         """
