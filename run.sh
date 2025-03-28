@@ -1,3 +1,3 @@
-#!bin/bash
-alembic upgrade head
+#!/bin/bash
+python -m alembic upgrade head
 python main.py

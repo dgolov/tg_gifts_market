@@ -6,7 +6,7 @@ services:
     container_name: bot_postgres
     restart:  unless-stopped
     env_file:
-      - ./.env.db
+      - ./.env
     environment:
       TZ: "Europe/Moscow"
       POSTGRES_USER: ${POSTGRES_USER}
