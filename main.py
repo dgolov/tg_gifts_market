@@ -1,6 +1,7 @@
 import asyncio
 from config import dp, bot, logger
-from src.handlers import register_handlers
+from src.handlers import register_main_handlers
+from src.sell.handlers import register_sell_handlers
 
 
 async def main():
@@ -8,7 +9,8 @@ async def main():
     :return:
     """
     logger.debug("Bot is online")
-    register_handlers(dispatcher=dp)
+    register_main_handlers(dispatcher=dp)
+    register_sell_handlers(dispatcher=dp)
     await dp.start_polling(bot)
 
 
