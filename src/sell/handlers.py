@@ -2,9 +2,8 @@ from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from config import CHANNEL_ID, logger, dp, bot
-from src.buttons import main_menu, cancel_button
-from src.sell.buttons import colors_menu, backgrounds_menu, models_menu, patterns_menu, public_menu
-
+from src.buttons import colors_menu, backgrounds_menu, models_menu, patterns_menu, public_menu, main_menu, cancel_button
+from src.patterns import Menu
 from src.gifts import SellGift
 from src.sell.logic import GiftLogic
 
@@ -19,7 +18,7 @@ async def sell_gift_start(message: Message, state: FSMContext):
     """
     username = message.from_user.username
     user_id = message.from_user.id
-    logger.debug(f"[Handlers] Sell gift Start command from user: {username} (id: {user_id})")
+    logger.debug(f"[Handlers.sell] Sell gift Start command from user: {username} (id: {user_id})")
     await message.answer("📝 Укажите название подарка:", reply_markup=cancel_button)
     await state.set_state(SellGift.gift_name)
 
@@ -32,7 +31,7 @@ async def set_gift_name(message: Message, state: FSMContext):
     """
     username = message.from_user.username
     user_id = message.from_user.id
-    logger.debug(f"[Handlers] Sell gift name {message.text} command from user: {username} (id: {user_id})")
+    logger.debug(f"[Handlers.sell] Sell gift name {message.text} command from user: {username} (id: {user_id})")
     await state.update_data(gift_name=message.text)
     await message.answer("📦 Выберите модель подарка:", reply_markup=models_menu)
     await state.set_state(SellGift.gift_model)
@@ -46,7 +45,7 @@ async def set_gift_model(message: Message, state: FSMContext):
     """
     username = message.from_user.username
     user_id = message.from_user.id
-    logger.debug(f"[Handlers] Sell gift model {message.text} command from user: {username} (id: {user_id})")
+    logger.debug(f"[Handlers.sell] Sell gift model {message.text} command from user: {username} (id: {user_id})")
     await state.update_data(gift_model=message.text)
     await message.answer("🖼 Выберите фон подарка (цветовая категория):", reply_markup=backgrounds_menu)
     await state.set_state(SellGift.gift_background)
@@ -60,7 +59,7 @@ async def set_gift_background(message: Message, state: FSMContext):
     """
     username = message.from_user.username
     user_id = message.from_user.id
-    logger.debug(f"[Handlers] Sell gift background {message.text} command from user: {username} (id: {user_id})")
+    logger.debug(f"[Handlers.sell] Sell gift background {message.text} command from user: {username} (id: {user_id})")
     await state.update_data(gift_background=message.text)
     await message.answer("🎨 Выберите цвет подарка:", reply_markup=colors_menu)
     await state.set_state(SellGift.gift_color)
@@ -74,7 +73,7 @@ async def set_gift_color(message: Message, state: FSMContext):
     """
     username = message.from_user.username
     user_id = message.from_user.id
-    logger.debug(f"[Handlers] Sell gift color {message.text} command from user: {username} (id: {user_id})")
+    logger.debug(f"[Handlers.sell] Sell gift color {message.text} command from user: {username} (id: {user_id})")
     await state.update_data(gift_color=message.text)
     await message.answer("🌟 Выберите узор подарка:", reply_markup=patterns_menu)
     await state.set_state(SellGift.waiting_for_price)
@@ -87,6 +86,9 @@ async def set_gift_price(message: Message, state: FSMContext):
     :param state:
     :return:
     """
+    username = message.from_user.username
+    user_id = message.from_user.id
+    logger.debug(f"[Handlers.sell] Sell gift price {message.text} command from user: {username} (id: {user_id})")
     await state.update_data(gift_pattern=message.text)
     await message.answer("💰 Укажите цену подарка в TON:", reply_markup=cancel_button)
     await state.set_state(SellGift.gift_pattern)
@@ -167,19 +169,8 @@ async def public_gift(message: Message, state: FSMContext):
     await state.clear()
 
 
-async def cancel_process(message: Message, state: FSMContext):
-    """ Отмена процесса
-    :param message:
-    :param state:
-    :return:
-    """
-    await state.clear()
-    await message.answer("🚫 Процесс отменен. Возвращаем в главное меню.", reply_markup=main_menu)
-
-
 def register_sell_handlers(dispatcher: Dispatcher):
-    dispatcher.message.register(sell_gift_start, lambda msg: msg.text == "🎁 Продать подарок")
-    dispatcher.message.register(cancel_process, lambda msg: msg.text == "❌ Отмена")
+    dispatcher.message.register(sell_gift_start, lambda msg: msg.text == Menu.SELL_GIFT)
     dispatcher.message.register(set_gift_pattern, SellGift.gift_pattern)
     dispatcher.message.register(set_gift_name, SellGift.gift_name)
     dispatcher.message.register(set_gift_model, SellGift.gift_model)
