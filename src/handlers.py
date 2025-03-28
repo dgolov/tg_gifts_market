@@ -1,9 +1,11 @@
 from aiogram import Dispatcher
 from aiogram.types import Message
 from aiogram.filters import CommandStart
+from aiogram.fsm.context import FSMContext
 from config import CHANNEL_ID, logger
 from src.buttons import main_menu, top_up_menu, profile_menu
 from src.helpers import check_subscription
+from src.patterns import Menu
 
 
 async def start_command(message: Message):
@@ -60,8 +62,19 @@ async def back_to_main(message: Message):
     await message.answer("🔙 Возвращаем вас в главное меню", reply_markup=main_menu)
 
 
+async def cancel_process(message: Message, state: FSMContext):
+    """ Отмена процесса
+    :param message:
+    :param state:
+    :return:
+    """
+    await state.clear()
+    await message.answer("🚫 Процесс отменен. Возвращаем в главное меню.", reply_markup=main_menu)
+
+
 def register_main_handlers(dispatcher: Dispatcher):
     dispatcher.message.register(start_command, CommandStart())
-    dispatcher.message.register(top_up_balance, lambda msg: msg.text == "💰 Пополнить баланс")
-    dispatcher.message.register(show_profile, lambda msg: msg.text == "👤 Профиль")
-    dispatcher.message.register(back_to_main, lambda msg: msg.text == "⬅️ Назад")
+    dispatcher.message.register(top_up_balance, lambda msg: msg.text == Menu.BALANCE)
+    dispatcher.message.register(cancel_process, lambda msg: msg.text == Menu.CANCEL)
+    dispatcher.message.register(show_profile, lambda msg: msg.text == Menu.PROFILE)
+    dispatcher.message.register(back_to_main, lambda msg: msg.text == Menu.BACK)
