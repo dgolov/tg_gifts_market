@@ -2,7 +2,7 @@ from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from config import CHANNEL_ID, logger, dp, bot
-from src.buttons import colors_menu, backgrounds_menu, models_menu, patterns_menu, public_menu, main_menu, cancel_button
+from src.buttons import colors_menu, models_menu, patterns_menu, public_menu, main_menu, cancel_button
 from src.patterns import Menu
 from src.gifts import SellGift
 from src.sell.logic import GiftLogic
@@ -47,7 +47,7 @@ async def set_gift_model(message: Message, state: FSMContext):
     user_id = message.from_user.id
     logger.debug(f"[Handlers.sell] Sell gift model {message.text} command from user: {username} (id: {user_id})")
     await state.update_data(gift_model=message.text)
-    await message.answer("🖼 Выберите фон подарка (цветовая категория):", reply_markup=backgrounds_menu)
+    await message.answer("🖼 Выберите фон подарка (цветовая категория):", reply_markup=colors_menu)
     await state.set_state(SellGift.gift_background)
 
 
@@ -75,12 +75,31 @@ async def set_gift_color(message: Message, state: FSMContext):
     user_id = message.from_user.id
     logger.debug(f"[Handlers.sell] Sell gift color {message.text} command from user: {username} (id: {user_id})")
     await state.update_data(gift_color=message.text)
+    await message.answer("#️⃣ Выберите номер подарка:", reply_markup=cancel_button)
+    await state.set_state(SellGift.gift_number)
+
+
+async def set_gift_number(message: Message, state: FSMContext):
+    """ Получаем цвет подарка
+    :param message:
+    :param state:
+    :return:
+    """
+    username = message.from_user.username
+    user_id = message.from_user.id
+    try:
+        int(message.text)
+    except ValueError:
+        await message.answer("#️⃣ Номер подарка должен быть числом:", reply_markup=cancel_button)
+        await state.set_state(SellGift.gift_number)
+        return
+    logger.debug(f"[Handlers.sell] Sell gift color {message.text} command from user: {username} (id: {user_id})")
+    await state.update_data(gift_number=message.text)
     await message.answer("🌟 Выберите узор подарка:", reply_markup=patterns_menu)
-    await state.set_state(SellGift.waiting_for_price)
+    await state.set_state(SellGift.gift_pattern)
 
 
-@dp.message(SellGift.waiting_for_price)
-async def set_gift_price(message: Message, state: FSMContext):
+async def set_gift_pattern(message: Message, state: FSMContext):
     """ Пользователь выбрал узор, теперь запрашиваем цену
     :param message:
     :param state:
@@ -91,10 +110,10 @@ async def set_gift_price(message: Message, state: FSMContext):
     logger.debug(f"[Handlers.sell] Sell gift price {message.text} command from user: {username} (id: {user_id})")
     await state.update_data(gift_pattern=message.text)
     await message.answer("💰 Укажите цену подарка в TON:", reply_markup=cancel_button)
-    await state.set_state(SellGift.gift_pattern)
+    await state.set_state(SellGift.waiting_for_price)
 
 
-async def set_gift_pattern(message: Message, state: FSMContext):
+async def set_gift_price(message: Message, state: FSMContext):
     """ Завершаем процесс продажи подарка
     :param message:
     :param state:
@@ -102,6 +121,14 @@ async def set_gift_pattern(message: Message, state: FSMContext):
     """
     username = message.from_user.username
     user_id = message.from_user.id
+
+    try:
+        float(message.text)
+    except ValueError:
+        await message.answer("#️⃣ Цена подарка должна быть числом:", reply_markup=cancel_button)
+        await state.set_state(SellGift.gift_number)
+        return
+
     await state.update_data(price=message.text)
 
     logger.debug(f"[Handlers] Sell gift pattern {message.text} command from user: {username} (id: {user_id})")
@@ -114,6 +141,7 @@ async def set_gift_pattern(message: Message, state: FSMContext):
     await message.answer(
         f"✅ Ваш подарок готов к продаже!\n\n"
         f"🎁 Название: {data.get('gift_name')}\n"
+        f"#️⃣ Номер: {data.get('gift_number')}\n"
         f"📦 Модель: {data.get('gift_model')}\n"
         f"🖼 Фон: {data.get('gift_background')}\n"
         f"🎨 Цвет: {data.get('gift_color')}\n"
@@ -141,6 +169,7 @@ async def public_gift(message: Message, state: FSMContext):
         f"🎁 *Новый подарок на продажу!*\n\n"
         f"👤 Продавец: @{username}  \n"
         f"🎁 *Название:* {data.get('gift_name')}\n"
+        f"#️⃣ Номер: {data.get('gift_number')}\n"
         f"📦 *Модель:* {data.get('gift_model')}\n"
         f"🖼 *Фон:* {data.get('gift_background')}\n"
         f"🎨 *Цвет:* {data.get('gift_color')}\n"
@@ -176,4 +205,6 @@ def register_sell_handlers(dispatcher: Dispatcher):
     dispatcher.message.register(set_gift_model, SellGift.gift_model)
     dispatcher.message.register(set_gift_background, SellGift.gift_background)
     dispatcher.message.register(set_gift_color, SellGift.gift_color)
+    dispatcher.message.register(set_gift_number, SellGift.gift_number)
     dispatcher.message.register(public_gift, SellGift.gift_public)
+    dispatcher.message.register(set_gift_price, SellGift.waiting_for_price)
