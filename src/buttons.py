@@ -14,8 +14,7 @@ colors_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text=Color.BLUE), KeyboardButton(text=Color.RED), KeyboardButton(text=Color.GREEN)],
         [KeyboardButton(text=Color.ORANGE), KeyboardButton(text=Color.YELLOW), KeyboardButton(text=Color.VIOLET)],
-        [KeyboardButton(text=Color.BLACK), KeyboardButton(text=Color.WHILE), KeyboardButton(text=Color.VIOLET)],
-        [KeyboardButton(text=Menu.CANCEL)]
+        [KeyboardButton(text=Color.BLACK), KeyboardButton(text=Color.WHILE), KeyboardButton(text=Menu.CANCEL)]
     ],
     resize_keyboard=True
 )
