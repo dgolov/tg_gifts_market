@@ -8,6 +8,7 @@ class SellGift(StatesGroup):
     gift_color = State()
     gift_pattern = State()
     gift_number = State()
+    gift_screenshot = State()
     waiting_for_price = State()
     gift_public = State()
 
