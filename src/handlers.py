@@ -16,6 +16,7 @@ async def start_command(message: Message):
     username = message.from_user.username
     user_id = message.from_user.id
     logger.debug(f"[Handlers] Start command from user: {username} (id: {user_id})")
+
     is_subscribed = await check_subscription(user_id)
 
     if is_subscribed:
@@ -37,6 +38,7 @@ async def top_up_balance(message: Message):
     username = message.from_user.username
     user_id = message.from_user.id
     logger.debug(f"[Handlers] Top up balance command from user: {username} (id: {user_id})")
+
     await message.answer("Выберите способ пополнения:", reply_markup=top_up_menu)
 
 
@@ -48,6 +50,7 @@ async def show_profile(message: Message):
     username = message.from_user.username
     user_id = message.from_user.id
     logger.debug(f"[Handlers] Show profile command from user: {username} (id: {user_id})")
+
     await message.answer("👤 Профиль:", reply_markup=profile_menu)
 
 
@@ -59,6 +62,7 @@ async def back_to_main(message: Message):
     username = message.from_user.username
     user_id = message.from_user.id
     logger.debug(f"[Handlers] Back to main command from user: {username} (id: {user_id})")
+
     await message.answer("🔙 Возвращаем вас в главное меню", reply_markup=main_menu)
 
 
@@ -68,6 +72,10 @@ async def cancel_process(message: Message, state: FSMContext):
     :param state:
     :return:
     """
+    username = message.from_user.username
+    user_id = message.from_user.id
+    logger.debug(f"[Handlers] Cancel command from user: {username} (id: {user_id})")
+
     await state.clear()
     await message.answer("🚫 Процесс отменен. Возвращаем в главное меню.", reply_markup=main_menu)
 

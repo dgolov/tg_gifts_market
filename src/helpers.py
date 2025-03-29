@@ -14,7 +14,7 @@ async def check_subscription(user_id: int) -> bool:
         chat_member = await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=user_id)
         return chat_member.status in SUBSCRIPTION_STATUSES
     except Exception as e:
-        logger.warning(f"[check_subscription] error for user: {user_id} ({e})")
+        logger.warning(f"[helpers.check_subscription] error for user: {user_id} ({e})")
         return False
 
 
@@ -27,6 +27,7 @@ def escape_markdown(text: str) -> str:
 def prepare_gift_list_message(gifts: List[Gift], average: int) -> str:
     """ Формирует сообщение со списком доступных подарков
     """
+    logger.debug("[helpers] prepare gift list message")
     response = "Список доступных подарков:\n\n"
 
     for gift in gifts:
