@@ -1,9 +1,7 @@
-from aiogram.types.user import User
 from config import logger
-from datetime import datetime
 from db.engine import AsyncSessionLocal
 from db.repository_entity import GiftEntity
-from typing import Dict, Union, Optional
+from typing import Dict, Optional
 
 
 class GiftLogic:

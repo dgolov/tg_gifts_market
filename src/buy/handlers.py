@@ -3,7 +3,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from config import logger
 from src.buy.logic import GiftLogic
-from src.helpers import prepare_gift_list_message
+from src.helpers import prepare_gift_list_message, check_gift_number_for_buy_logic
 from src.gifts import BuyGift
 from src.buttons import colors_menu, models_menu, patterns_menu, main_menu, cancel_button
 from src.patterns import Menu
@@ -101,7 +101,7 @@ async def set_gift_number(message: types.Message, state: FSMContext):
     username = message.from_user.username
     user_id = message.from_user.id
     try:
-        int(message.text)
+        check_gift_number_for_buy_logic(gift_number=message.text)
     except ValueError:
         await message.answer("#️⃣ Номер подарка должен быть числом:", reply_markup=cancel_button)
         await state.set_state(BuyGift.gift_number)
