@@ -35,6 +35,7 @@ class GiftLogic:
             "user_id": user.id,
             "username": user.username,
             "gift_name": data.get('gift_name'),
+            "gift_number": self.get_gift_number(data.get('gift_number')),
             "gift_model": data.get('gift_model'),
             "gift_background": data.get('gift_background'),
             "gift_color": data.get('gift_color'),
@@ -46,6 +47,10 @@ class GiftLogic:
 
     def get_gift_name(self, gift_name: Optional[str]) -> Optional[str]:
         ...
+
+    @staticmethod
+    def get_gift_number(gift_number: Optional[str]) -> Optional[int]:
+        return int(gift_number)
 
     def get_gift_model(self, gift_model: Optional[str]) -> Optional[str]:
         ...
