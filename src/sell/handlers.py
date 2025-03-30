@@ -101,6 +101,19 @@ async def set_gift_number(message: Message, state: FSMContext):
     logger.debug(f"[Handlers.sell] Set gift number {message.text} command from user: {username} (id: {user_id})")
 
     await state.update_data(gift_number=message.text)
+    await message.answer("📸 Теперь загрузите скриншот подарка:", reply_markup=cancel_button)
+    await state.set_state(SellGift.gift_screenshot)
+
+
+async def set_gift_screenshot(message: Message, state: FSMContext):
+    if not message.photo:
+        await message.answer("❌ Пожалуйста, отправьте изображение!")
+        return
+
+    # Получаем файл ID самого большого изображения (последнее в списке)
+    photo_id = message.photo[-1].file_id
+
+    await state.update_data(gift_screenshot=photo_id)
     await message.answer("🌟 Выберите узор подарка:", reply_markup=patterns_menu)
     await state.set_state(SellGift.gift_pattern)
 
@@ -186,7 +199,16 @@ async def public_gift(message: Message, state: FSMContext):
     )
 
     try:
-        sent_message = await bot.send_message(CHANNEL_ID, post_text, parse_mode="Markdown")
+        if "gift_screenshot" in data:
+            sent_message = await bot.send_photo(
+                CHANNEL_ID,
+                photo=data["gift_screenshot"],
+                caption=post_text,
+                parse_mode="Markdown"
+            )
+        else:
+            sent_message = await bot.send_message(CHANNEL_ID, post_text, parse_mode="Markdown")
+
         post_id = sent_message.message_id
         logger.debug(f"[Handlers.sell] Post id - {post_id}")
         await GiftLogic().save_post_to_db(data=data, user=message.from_user, post_id=post_id)
@@ -213,5 +235,6 @@ def register_sell_handlers(dispatcher: Dispatcher):
     dispatcher.message.register(set_gift_background, SellGift.gift_background)
     dispatcher.message.register(set_gift_color, SellGift.gift_color)
     dispatcher.message.register(set_gift_number, SellGift.gift_number)
+    dispatcher.message.register(set_gift_screenshot, SellGift.gift_screenshot)
     dispatcher.message.register(public_gift, SellGift.gift_public)
     dispatcher.message.register(set_gift_price, SellGift.waiting_for_price)
