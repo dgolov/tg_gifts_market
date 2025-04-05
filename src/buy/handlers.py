@@ -51,21 +51,6 @@ async def set_gift_model(message: types.Message, state: FSMContext):
 
 
 async def set_gift_background(message: types.Message, state: FSMContext):
-    """ Получаем цвет подарка и продолжаем выбор цвета
-    """
-    username = message.from_user.username
-    user_id = message.from_user.id
-    logger.debug(f"[Handlers.buy] Set gift background {message.text} command from user: {username} (id: {user_id})")
-
-    await state.update_data(gift_background=message.text)
-    await message.answer(
-        text="🎨 Выберите цвет подарка (если не важно, ставите -):",
-        reply_markup=colors_menu
-    )
-    await state.set_state(BuyGift.gift_color)
-
-
-async def set_gift_color(message: types.Message, state: FSMContext):
     """ Получаем цвет подарка и продолжаем выбор узора
     """
     username = message.from_user.username
@@ -77,17 +62,17 @@ async def set_gift_color(message: types.Message, state: FSMContext):
         text="🌟 Выберите узор подарка (если не важно, ставите -):",
         reply_markup=patterns_menu
     )
-    await state.set_state(BuyGift.gift_pattern)
+    await state.set_state(BuyGift.gift_symbol)
 
 
-async def set_gift_pattern(message: types.Message, state: FSMContext):
+async def set_gift_symbol(message: types.Message, state: FSMContext):
     """ Получаем узор подарка и продолжаем выбор номера
     """
     username = message.from_user.username
     user_id = message.from_user.id
     logger.debug(f"[Handlers.buy] Set gift price {message.text} command from user: {username} (id: {user_id})")
 
-    await state.update_data(gift_pattern=message.text)
+    await state.update_data(gift_symbol=message.text)
     await message.answer(
         text="🔢 Укажите номер подарка (если не важно, ставите -):",
         reply_markup=cancel_button
@@ -146,6 +131,5 @@ def register_buy_handlers(dispatcher: Dispatcher):
     dispatcher.message.register(set_gift_name, BuyGift.gift_name)
     dispatcher.message.register(set_gift_model, BuyGift.gift_model)
     dispatcher.message.register(set_gift_background, BuyGift.gift_background)
-    dispatcher.message.register(set_gift_color, BuyGift.gift_color)
-    dispatcher.message.register(set_gift_pattern, BuyGift.gift_pattern)
+    dispatcher.message.register(set_gift_symbol, BuyGift.gift_symbol)
     dispatcher.message.register(set_gift_number, BuyGift.gift_number)
