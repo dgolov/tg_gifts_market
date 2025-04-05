@@ -10,12 +10,11 @@ class BaseEntity:
 
 
 class GiftEntity(BaseEntity):
-    async def save_gift(self, gift_data: dict):
+    async def save_gift(self, gift: Gift):
         """ Сохраняем подарок в БД
-        :param gift_data:
+        :param gift:
         :return:
         """
-        gift = Gift(**gift_data)
         self.session.add(gift)
         await self.session.commit()
         await self.session.refresh(gift)

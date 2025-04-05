@@ -20,3 +20,20 @@ class Gift(Base):
     updated_at = Column(DateTime, default=func.now())
     post_id = Column(Integer, nullable=True)
     url = Column(String, nullable=False)
+
+    def dict(self):
+        """ Метод для преобразования объекта Gift в словарь.
+        """
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            "owner": self.owner,
+            "name": self.name,
+            "number": self.number,
+            "model": self.model,
+            "background": self.background,
+            "symbol": self.symbol,
+            "price": self.price,
+            "post_id": self.post_id,
+            "url": self.url
+        }
